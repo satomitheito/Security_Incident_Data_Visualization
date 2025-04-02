@@ -1,0 +1,92 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Libre Franklin', sans-serif;
+  }
+  
+  .slides-container {
+    height: 100vh;
+    width: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+  
+  .slide {
+    height: 100vh;
+    width: 100%;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #DEDEDE;
+    position: relative;
+  }
+  
+  /* Text styles */
+  .hero-text h1, .frame-text h2 {
+    color: #430101;
+    font-weight: 700;
+    text-align: center;
+  }
+  
+  .hero-text h1 {
+    font-size: 60px;
+  }
+  
+  .frame-text h2 {
+    font-size: 40px;
+    line-height: 1.4;
+  }
+  
+  /* Scroll hint */
+  .scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    cursor: pointer;
+    text-align: center;
+    animation: pulse 2s infinite;
+    color: #430101;
+  }
+  
+  .scroll-text {
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+    font-weight: 700;
+  }
+  
+  .arrow {
+    font-size: 1.5rem;
+  }
+  
+  /* Pulse animation */
+  @keyframes pulse {
+    0% { opacity: 1; transform: translateY(0); }
+    50% { opacity: 0.6; transform: translateY(5px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Fullscreen map container */
+  .map-slide {
+    overflow: hidden;
+    position: relative;
+    background-color: transparent;
+  }
+  
+  .map-reveal {
+    width: 100%;
+    height: 100%;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 1s ease-out;
+  }
+
+  .map-reveal.visible {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
