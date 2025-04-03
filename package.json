@@ -1,0 +1,29 @@
+{
+  "name": "security_incident_data_visualization",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/satomitheito/Security_Incident_Data_Visualization.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/satomitheito/Security_Incident_Data_Visualization/issues"
+  },
+  "homepage": "https://github.com/satomitheito/Security_Incident_Data_Visualization#readme",
+  "dependencies": {
+    "d3": "^7.9.0",
+    "papaparse": "^5.5.2",
+    "plotly.js-dist": "^3.0.1"
+  }
+}

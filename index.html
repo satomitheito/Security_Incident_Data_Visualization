@@ -2,44 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Targeted While Helping</title>
+  <title>The Cost of Care</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style/main.css">
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="node_modules/plotly.js-dist/plotly.js"></script>
+  <script src="node_modules/d3/dist/d3.min.js"></script>
+  <script src="node_modules/papaparse/papaparse.min.js"></script>
+  <script src="script/choropleth-map-entireworld.js"></script>
 
 </head>
 <body>
-    <div class="slides-container">
-      
-      <!-- Slide 1 -->
-      <section class="slide" id="slide1">
-        <div class="hero-text">
-          <h1>Targeted While Helping</h1>
-        </div>
-        <div class="scroll-hint" onclick="document.getElementById('slide2').scrollIntoView({ behavior: 'smooth' });">
-          <span class="scroll-text">Scroll</span>
-          <span class="arrow">↓</span>
-        </div>
-      </section>
-  
-      <!-- Slide 2 -->
-      <section class="slide" id="slide2">
-        <div class="frame-text">
-          <h2>Mapping the dangers<br>of humanitarian work.</h2>
-        </div>
-      </section>
-  
-      <!-- Slide 3 (choropleth only) -->
-      <section class="slide map-slide" id="slide3">
-        <div class="map-reveal" id="map-container"></div>
-      </section>
-  
+  <!-- Hero Section (top layer) -->
+  <section id="intro" class="hero-section">
+    <div class="hero-text-container">
+      <h1 class="hero-text frame1 active">Targeted While Helping</h1>
+      <h1 class="hero-text frame2">Mapping the dangers<br>of humanitarian work.</h1>
     </div>
-  
-    <script src="script/main.js"></script>
-  </body>
-  
+
+    <!-- Scroll Hint -->
+    <div class="scroll-hint" onclick="document.getElementById('content').scrollIntoView({behavior: 'smooth'});">
+      <span class="scroll-text">Scroll</span>
+      <span class="arrow">↓</span>
+    </div>
+  </section>
+
+  <!-- Background Layer -->
+  <section id="content">
+    <div class="content-background">
+      <!-- This stays as the base -->
+      <div id="map-container" style="height: 100vh;"></div>
+    </div>
+  </section>
+
+  <!-- Layered Foreground Sections (stacked on top while scrolling) -->
+  <section class="overlay-section">
+    <div class="overlay-content">
+    </div>
+  </section>
+
+  <section class="overlay-section">
+    <div class="overlay-content">
+      <h2>Where?</h2>
+    </div>
+  </section>
+  <script src="script/main.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script src="script/choropleth-map-entireworld.js"></script>
+</body>
 </html>

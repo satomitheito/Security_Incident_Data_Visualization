@@ -1,10 +1,13 @@
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.6 });
-  
-  const mapElement = document.querySelector('.map-reveal');
-  observer.observe(mapElement);
+window.addEventListener('scroll', () => {
+  const frame2 = document.querySelector('.frame2');
+  const frame1 = document.querySelector('.frame1');
+  const scrollY = window.scrollY;
+
+  if (scrollY > 50) {
+    frame1.classList.remove('active');
+    frame2.classList.add('active');
+  } else {
+    frame1.classList.add('active');
+    frame2.classList.remove('active');
+  }
+});
