@@ -131,7 +131,7 @@ class TotalIncidentGraph {
           zeroline: false
         },
         hovermode: 'closest',
-        margin: { t: 50, r: 50, b: 100, l: 80 },
+        margin: { t: 60, r: 60, b: 110, l: 90 },
         autosize: true,
         height: 450,
         dragmode: false,
