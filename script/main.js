@@ -20,4 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize the National vs International Graph component
   const comparisonGraph = new NationalVsInternationalGraph('national-vs-international-graph');
   comparisonGraph.render();
+
+  const genderGraph = new GenderComparisonGraph('gender-graph');
+  genderGraph.render();
+
+  const rolesGraph = new RolesBarGraph('roles-graph');
+  rolesGraph.render();
+
+  const wordCloud = new WordCloud('word-cloud-container');
+  wordCloud.render();
 }); 

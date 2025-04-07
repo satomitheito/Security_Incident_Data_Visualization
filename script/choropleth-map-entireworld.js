@@ -104,7 +104,7 @@ d3.csv("../data/security_incidents.csv").then(data => {
         landcolor: '#8A9A5B',
         showframe: false,
         showcountries: true,
-        bgcolor: 'rgba(0,0,0,0)',
+        bgcolor: '#dedede',
         margin: { t: 0, b: 0, l: 0, r: 0 },
         lataxis: {
           range: [-55, 80]
@@ -115,8 +115,8 @@ d3.csv("../data/security_incidents.csv").then(data => {
         dragmode: false  // Disable dragging on the geo component
       },
       margin: { t: 0, b: 0, l: 0, r: 0, pad: 0 },
-      paper_bgcolor: 'rgba(0,0,0,0)',
-      plot_bgcolor: 'rgba(0,0,0,0)',
+      paper_bgcolor: '#dedede',
+      plot_bgcolor: '#dedede',
       showlegend: false,
       autosize: true,
       width: window.innerWidth,

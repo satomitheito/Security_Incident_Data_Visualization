@@ -137,7 +137,8 @@ class NationalVsInternationalGraph {
           titlefont: { color: 'white', family: 'Libre Franklin' },
           tickfont: { color: 'white', family: 'Libre Franklin' },
           showgrid: false,
-          zeroline: false
+          zeroline: false,
+          tickangle: -45
         },
         yaxis: {
           title: 'Number of Incidents',
@@ -154,7 +155,7 @@ class NationalVsInternationalGraph {
           bgcolor: 'transparent'
         },
         hovermode: 'closest',
-        margin: { t: 50, r: 50, b: 100, l: 80 },
+        margin: { t: 50, r: 50, b: 100, l: 120, pad: 10 },
         autosize: true,
         height: 450,
         plot_bgcolor: '#8A9A5B',

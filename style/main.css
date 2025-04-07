@@ -252,7 +252,7 @@ h2 {
 
 .graph-container {
   width: 85%;
-  height: 425px;
+  height: 450px;
   margin: 0 auto;
   background-color: #8A9A5B;
   border-radius: 8px;
@@ -302,4 +302,65 @@ body.scroll-hijacked {
   text-align: center;
   color: #430101;
   margin-bottom: 30px;
+}
+
+
+#gender-graph {
+  position: relative;
+  z-index: 3;
+  background-color: #8A9A5B;
+  padding: 60px 0 200px 0;
+}
+
+.gender-graph {
+  background-color: #8A9A5B;
+}
+
+.gender-graph-section h2 {
+  text-align: center;
+  color: #430101;
+  margin-bottom: 30px;
+}
+
+#roles-graph {
+  position: relative;
+  z-index: 3;
+  background-color: #8A9A5B;
+  padding: 60px 0 200px 0;
+}
+
+.roles-graph {
+  background-color: #8A9A5B;
+}
+
+.roles-graph-section h2 {
+  text-align: center;
+  color: #430101;
+  margin-bottom: 30px;
+}
+
+#word-cloud-container {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 50%;
+  background-color: #DEDEDE;
+  padding: 100px 0 80px 0;
+}
+
+.word-cloud-section {
+  width: 100%;
+  padding: 20px 0;
+}
+
+.word-cloud-section .container {
+  width: 100%;
+  margin: 0 auto;
+}
+.graph-container#word-cloud {
+  width: 100%;
+  height: 600px;
+  background-color: #DEDEDE;
+  margin: 0 auto;
+  padding: 20px;
 }
