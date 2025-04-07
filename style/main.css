@@ -121,7 +121,7 @@ h2 {
 
 /* Text Section */
 .text-section {
-  min-height: 70vh;
+  min-height: 50vh;
   background-color: #8A9A5B;
   display: flex;
   align-items: flex-start;
@@ -231,64 +231,30 @@ h2 {
   display: block;
 }
 
-.additional-section {
-  min-height: 100vh;
-  background-color: #8A9A5B;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
-}
-
-.additional-content {
-  max-width: 800px;
-  text-align: center;
-  color: white;
-}
-
-.additional-content h2 {
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.additional-content .text-container {
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 2rem;
-  border-radius: 10px;
-  backdrop-filter: blur(5px);
-}
-
-.additional-content p {
-  font-size: 1.2rem;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-}
-
 
 /* Total Incident Graph styles */
 #total-incident-graph {
   position: relative;
   z-index: 3; /* Higher than the map container's z-index of 1 */
-  background-color: white;
+  background-color: #8A9A5B;
   padding: 60px 0 200px 0;
 }
 
 .total-incident-graph-section {
-  background-color: white;
+  background-color: #8A9A5B;
 }
 
 .total-incident-graph-section h2 {
   text-align: center;
-  color: #4a69bd;
+  color: #430101;
   margin-bottom: 30px;
 }
 
 .graph-container {
-  width: 100%;
-  height: 500px; /* Set a fixed height for the graph */
+  width: 85%;
+  height: 425px;
   margin: 0 auto;
-  background-color: #fff;
+  background-color: #8A9A5B;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -308,4 +274,32 @@ h2 {
 body.scroll-hijacked {
   overflow: hidden;
   height: 100vh;
+}
+
+.graph-title {
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #430101;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
+/* National vs International Graph styles */
+#national-vs-international-graph {
+  position: relative;
+  z-index: 3;
+  background-color: #8A9A5B;
+  padding: 60px 0 200px 0;
+}
+
+.national-international-graph-section {
+  background-color: #8A9A5B;
+}
+
+.national-international-graph-section h2 {
+  text-align: center;
+  color: #430101;
+  margin-bottom: 30px;
 }

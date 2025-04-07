@@ -16,4 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize the Incident Graph component
   const totalIncidentGraph = new TotalIncidentGraph('total-incident-graph');
   totalIncidentGraph.render();
+
+  // Initialize the National vs International Graph component
+  const comparisonGraph = new NationalVsInternationalGraph('national-vs-international-graph');
+  comparisonGraph.render();
 }); 

@@ -29,7 +29,7 @@ class TotalIncidentGraph {
     const template = `
       <div class="total-incident-graph-section">
         <div class="container">
-          <h2>Interactive Total Incident Graph</h2>
+          <p class="graph-title">Total Incidents By Year</p>
           <div class="graph-container" id="incidents-graph"></div>
         </div>
       </div>
@@ -101,31 +101,43 @@ class TotalIncidentGraph {
         y: [incidents[0]],
         type: 'scatter',
         mode: 'lines+markers',
-        marker: { size: 8, color: '#4285F4' },
-        line: { width: 3, color: '#4285F4' },
+        marker: { size: 8, color: '#ffffff' },
+        line: { width: 3, color: '#ffffff' },
         fill: 'tozeroy',
-        fillcolor: 'rgba(66, 133, 244, 0.2)',
+        fillcolor: 'rgba(255, 255, 255, 0.2)',
         hovertemplate: '%{x} - %{y} incidents<extra></extra>'
       };
       
       const layout = {
-        title: 'Total Security Incidents by Year (1997-2024)',
         xaxis: {
           title: 'Year',
           tickmode: 'linear',
           tick0: Math.min(...years),
           dtick: 1,
-          range: [Math.min(...years), 2024]
+          range: [Math.min(...years), 2024],
+          color: 'white',
+          titlefont: { color: 'white', family: 'Libre Franklin' },
+          tickfont: { color: 'white', family: 'Libre Franklin' },
+          showgrid: false,
+          zeroline: false
         },
         yaxis: {
           title: 'Number of Incidents',
-          range: [0, Math.max(...incidents) * 1.1]
+          range: [0, Math.max(...incidents) * 1.1],
+          color: 'white',
+          titlefont: { color: 'white', family: 'Libre Franklin' },
+          tickfont: { color: 'white', family: 'Libre Franklin' },
+          showgrid: false,
+          zeroline: false
         },
         hovermode: 'closest',
         margin: { t: 50, r: 50, b: 100, l: 80 },
         autosize: true,
         height: 450,
-        dragmode: false
+        dragmode: false,
+        plot_bgcolor: '#8A9A5B',
+        paper_bgcolor: '#8A9A5B',
+        font: { color: 'white', family: 'Libre Franklin' }
       };
       
       const config = {
@@ -167,8 +179,8 @@ class TotalIncidentGraph {
         hovertemplate: '%{x} - %{y} incidents<extra></extra>'
       }]
     }, {
-      transition: { duration: 50, easing: 'cubic-out' },
-      frame: { duration: 50 }
+      transition: { duration: 30, easing: 'cubic-out' },
+      frame: { duration: 30 }
     });
   }
   
@@ -231,9 +243,9 @@ class TotalIncidentGraph {
           const isAtEnd = this.scrollProgress >= 1 && this.lastScrollY - window.scrollY < 0;
           const visibleRatio = entry.intersectionRatio;
           
-          if (visibleRatio >= 0.3 && !isInExactMiddle && !this.isScrollHijacked && !isAtStart && !isAtEnd) {
+          if (visibleRatio >= 1 && !isInExactMiddle && !this.isScrollHijacked && !isAtStart && !isAtEnd) {
             const scrollSpeed = Math.abs(this.lastScrollY - window.scrollY) || 0;
-            if (scrollSpeed > 50) {
+            if (scrollSpeed > 10) {
               const targetScrollPosition = window.scrollY + (graphCenter - viewportCenter);
               
               window.scrollTo({
