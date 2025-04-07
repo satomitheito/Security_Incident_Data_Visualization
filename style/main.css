@@ -107,14 +107,10 @@ body {
 }
 
 .overlay-content {
+  position: relative;
+  width: 100%;
   text-align: center;
-  font-family: 'Libre Franklin', sans-serif;
-  color: #430101;
-  font-weight: 700;
-  padding: 5.75rem;
-  border-radius: 8px;
-  background: transparent;
-  pointer-events: none;  /* Allow clicks to pass through */
+  z-index: 2;
 }
 
 h2 {
@@ -125,7 +121,7 @@ h2 {
 
 /* Text Section */
 .text-section {
-  min-height: 50vh;
+  min-height: 70vh;
   background-color: #8A9A5B;
   display: flex;
   align-items: flex-start;
@@ -162,23 +158,109 @@ h2 {
   width: fit-content;
 }
 
-/* Region Focus Section */
-.region-focus {
-  position: relative;
+/* Map Title */
+.map-title {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #430101;
+  text-align: center;
+  pointer-events: none;
 }
 
-/* Zoom effect for the map */
-.map-zoomed .content-background {
-  transform: scale(2);
-  transition: transform 1s ease;
-}
-
-/* Add this to your JavaScript to trigger the zoom */
-.region-focus.active ~ .content-background {
-  transform: scale(2);
-}
-
-/* Adjust the base map container for smooth transitions */
 #map-container {
-  transition: transform 1s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+}
+
+#sudan-map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+}
+
+#syria-map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+}
+
+.sudan-info-box {
+  position: absolute;
+  top: 50%;
+  right: 5%;
+  transform: translateY(-50%);
+  background-color: #6d029c;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  max-width: 300px;
+  font-size: 1rem;
+  z-index: 2;
+  display: none;
+}
+
+.sudan-info-box h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: none;
+}
+
+.sudan-info-box p {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.sudan-info-box.visible {
+  display: block;
+}
+
+.additional-section {
+  min-height: 100vh;
+  background-color: #8A9A5B;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.additional-content {
+  max-width: 800px;
+  text-align: center;
+  color: white;
+}
+
+.additional-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.additional-content .text-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
+
+.additional-content p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
 }

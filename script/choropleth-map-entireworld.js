@@ -16,7 +16,7 @@ d3.csv("../data/security_incidents.csv").then(data => {
   
     const plotData = [{
       type: 'choropleth',
-      locationmode: 'country names', // ← same as your Python code
+      locationmode: 'country names',
       locations: locations,
       z: zValues,
       text: textValues,
@@ -41,43 +41,270 @@ d3.csv("../data/security_incidents.csv").then(data => {
         "<extra></extra>",
       zmin: 0
     }];
+
+    // Create Sudan-focused data
+    const sudanData = [{
+      type: 'choropleth',
+      locationmode: 'country names',
+      locations: ['South Sudan'],
+      z: [1],
+      text: ['South Sudan'],
+      colorscale: [[0, '#b300ff'], [1, '#b300ff']], // Bright purple for Sudan
+      showscale: false,
+      marker: {
+        line: {
+          color: '#999999',
+          width: 1.5
+        }
+      },
+      name: ''
+    }];
+
+    const syriaData = [{
+      type: 'choropleth',
+      locationmode: 'country names',
+      locations: ['Syrian Arab Republic'],
+      z: [1],
+      text: ['Syrian Arab Republic'],
+      colorscale: [[0, '#00b3ff'], [1, '#00b3ff']], 
+      showscale: false,
+      marker: {
+        line: {
+          color: '#999999',
+          width: 1.5
+        }
+      },
+      name: ''
+    }];
+
+    const somaliaData = [{
+        type: 'choropleth',
+        locationmode: 'country names',
+        locations: ['Somalia'],
+        z: [1],
+        text: ['Somalia'],
+        colorscale: [[0, '#ff6a00'], [1, '#ff6a00']], 
+        showscale: false,
+        marker: {
+          line: {
+            color: '#999999',
+            width: 1.5
+          }
+        },
+        name: ''
+    }];
   
-    const layout = {
+    const mainLayout = {
       geo: {
         projection: { 
           type: 'equirectangular'
         },
         showland: true,
-        showcoastlines: false,  // Remove coastlines
-        landcolor: '#8A9A5B',   // Changed from #ffffff to #dedede
+        showcoastlines: true,
+        landcolor: '#8A9A5B',
         showframe: false,
         showcountries: true,
-        bgcolor: '#dedede',     // Changed from rgba(0,0,0,0) to #dedede
+        bgcolor: 'rgba(0,0,0,0)',
         margin: { t: 0, b: 0, l: 0, r: 0 },
         lataxis: {
-          range: [-55, 80],
-          fixedrange: true  // Prevent latitude dragging
+          range: [-55, 80]
         },
         lonaxis: {
-          range: [-150, 180],
-          fixedrange: true  // Prevent longitude dragging
+          range: [-180, 180]
         },
-        dragmode: false  // Disable dragging
+        dragmode: false  // Disable dragging on the geo component
       },
       margin: { t: 0, b: 0, l: 0, r: 0, pad: 0 },
-      paper_bgcolor: '#dedede',
-      plot_bgcolor: '#dedede',
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)',
       showlegend: false,
       autosize: true,
-      dragmode: false  // Disable dragging at layout level
+      width: window.innerWidth,
+      height: window.innerHeight,
+      dragmode: false  // Disable dragging globally
     };
-  
-    Plotly.newPlot('map-container', plotData, layout, {
+
+    // Create both maps initially
+    Plotly.newPlot('map-container', plotData, mainLayout, {
       responsive: true,
       displayModeBar: false,
       scrollZoom: false,
-      dragmode: false,  // Disable dragging in config
-      staticPlot: false  
+      staticPlot: false // This will disable all interactions
+    });
+
+    // Create containers for all focus maps
+    const sudanContainer = document.createElement('div');
+    sudanContainer.id = 'sudan-map-container';
+    sudanContainer.style.cssText = `
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+    `;
+    document.getElementById('map-container').parentNode.appendChild(sudanContainer);
+
+    const syriaContainer = document.createElement('div');
+    syriaContainer.id = 'syria-map-container';
+    syriaContainer.style.cssText = `
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+    `;
+    document.getElementById('map-container').parentNode.appendChild(syriaContainer);
+
+    const somaliaContainer = document.createElement('div');
+    somaliaContainer.id = 'somalia-map-container';
+    somaliaContainer.style.cssText = `
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+    `;
+    document.getElementById('map-container').parentNode.appendChild(somaliaContainer);
+
+    // Create info box
+    const infoBox = document.createElement('div');
+    infoBox.className = 'sudan-info-box';
+    
+    const textSections = [
+      {
+        title: "South Sudan",
+        content: "In April 28th 2012, three internationals and one national working on a UN demining project were abducted by militia (dressed in SPLA uniforms) from Unity South Sudan, brought to Kahrtoum, and held until 20 May.",
+        country: "sudan"
+      },
+      {
+        title: "Syrian Arab Republic",
+        content: "In March 6th 2025, one UN aid worker was shot and killed when caught in a crossfire in Jableh, driving to Latakia, Latakia governorate.",
+        country: "syria"
+      },
+      {
+        title: "Somalia",
+        content: "In October 21st 2021, one NGO staff member was shot and killed by a militia member after refusing a food ration card the perpetrator was not entitled to.",
+        country: "somalia"
+      }
+    ];
+
+    // Set initial content
+    infoBox.innerHTML = `
+      <h2>${textSections[0].title}</h2>
+      <p>${textSections[0].content}</p>
+    `;
+    document.getElementById('map-container').parentNode.appendChild(infoBox);
+
+    // Create all focus maps with the same settings
+    Plotly.newPlot('sudan-map-container', sudanData, mainLayout, {
+      responsive: true,
+      displayModeBar: false,
+      scrollZoom: false,
+      staticPlot: true
+    });
+
+    Plotly.newPlot('syria-map-container', syriaData, mainLayout, {
+      responsive: true,
+      displayModeBar: false,
+      scrollZoom: false,
+      staticPlot: true
+    });
+
+    Plotly.newPlot('somalia-map-container', somaliaData, mainLayout, {
+      responsive: true,
+      displayModeBar: false,
+      scrollZoom: false,
+      staticPlot: true
+    });
+
+    // Add scroll event listener to switch between maps
+    window.addEventListener('scroll', () => {
+      const highlightSection = document.querySelector('.highlight-section');
+      if (!highlightSection) return;
+
+      const rect = highlightSection.getBoundingClientRect();
+      const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+
+      if (isVisible) {
+        // Calculate which text section to show based on scroll position
+        const sectionHeight = highlightSection.offsetHeight;
+        const scrollPosition = Math.abs(rect.top);
+        const sectionIndex = Math.min(
+          Math.floor((scrollPosition / sectionHeight) * textSections.length),
+          textSections.length - 1
+        );
+
+        // Update text content
+        infoBox.innerHTML = `
+          <h2>${textSections[sectionIndex].title}</h2>
+          <p>${textSections[sectionIndex].content}</p>
+        `;
+
+        // Determine which map to show based on the current section
+        const currentCountry = textSections[sectionIndex].country;
+        
+        // Update info box color based on country
+        const colors = {
+          'sudan': '#6d029c',
+          'syria': '#00b3ff',
+          'somalia': '#ff6a00'
+        };
+        infoBox.style.backgroundColor = colors[currentCountry];
+
+        // Hide all maps first
+        document.getElementById('map-container').style.display = 'none';
+        document.getElementById('sudan-map-container').style.display = 'none';
+        document.getElementById('syria-map-container').style.display = 'none';
+        document.getElementById('somalia-map-container').style.display = 'none';
+        
+        // Show the appropriate map
+        if (currentCountry === 'sudan') {
+          document.getElementById('sudan-map-container').style.display = 'block';
+        } else if (currentCountry === 'syria') {
+          document.getElementById('syria-map-container').style.display = 'block';
+        } else if (currentCountry === 'somalia') {
+          document.getElementById('somalia-map-container').style.display = 'block';
+        }
+
+        // Update map data to disable interactions
+        const noInteractionData = {
+          hoverinfo: 'skip',
+          hoverlabel: { bgcolor: 'transparent' },
+          enableMouseEvents: false
+        };
+        
+        if (currentCountry === 'sudan') {
+          Plotly.update('sudan-map-container', noInteractionData, mainLayout);
+        } else if (currentCountry === 'syria') {
+          Plotly.update('syria-map-container', noInteractionData, mainLayout);
+        } else if (currentCountry === 'somalia') {
+          Plotly.update('somalia-map-container', noInteractionData, mainLayout);
+        }
+      } else {
+        // Show main map when section is not visible
+        document.getElementById('map-container').style.display = 'block';
+        document.getElementById('sudan-map-container').style.display = 'none';
+        document.getElementById('syria-map-container').style.display = 'none';
+        document.getElementById('somalia-map-container').style.display = 'none';
+      }
+      
+      // Toggle info box visibility
+      infoBox.classList.toggle('visible', isVisible);
+    });
+
+    // Add window resize event listener to update map sizes
+    window.addEventListener('resize', () => {
+      const updateLayout = {
+        width: window.innerWidth,
+        height: window.innerHeight
+      };
+      Plotly.relayout('map-container', updateLayout);
+      Plotly.relayout('sudan-map-container', updateLayout);
+      Plotly.relayout('syria-map-container', updateLayout);
+      Plotly.relayout('somalia-map-container', updateLayout);
     });
   });
   
