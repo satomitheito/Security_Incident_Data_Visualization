@@ -264,3 +264,48 @@ h2 {
   line-height: 1.6;
   margin-bottom: 1rem;
 }
+
+
+/* Total Incident Graph styles */
+#total-incident-graph {
+  position: relative;
+  z-index: 3; /* Higher than the map container's z-index of 1 */
+  background-color: white;
+  padding: 60px 0 200px 0;
+}
+
+.total-incident-graph-section {
+  background-color: white;
+}
+
+.total-incident-graph-section h2 {
+  text-align: center;
+  color: #4a69bd;
+  margin-bottom: 30px;
+}
+
+.graph-container {
+  width: 100%;
+  height: 500px; /* Set a fixed height for the graph */
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Fade in animation for the data points */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Add this class to Plotly points for animation */
+.js-plotly-plot .plotly .points path {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Scroll hijacking styles */
+body.scroll-hijacked {
+  overflow: hidden;
+  height: 100vh;
+}

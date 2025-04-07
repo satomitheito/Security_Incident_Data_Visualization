@@ -11,3 +11,9 @@ window.addEventListener('scroll', () => {
     frame2.classList.remove('active');
   }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize the Incident Graph component
+  const totalIncidentGraph = new TotalIncidentGraph('total-incident-graph');
+  totalIncidentGraph.render();
+}); 

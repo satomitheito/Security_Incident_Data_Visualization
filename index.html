@@ -9,9 +9,12 @@
   <link rel="stylesheet" href="style/main.css">
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+  
+  <script src="script/choropleth-map-entireworld.js"></script>
+  <script src="script/TotalIncidentGraph.js"></script>
 
   <script src="script/main.js"></script>
-  <script src="script/choropleth-map-entireworld.js"></script>
+
 
 </head>
 <body>
@@ -37,6 +40,9 @@
       </div>
     </div>
   </section>
+
+  <!-- Container for the Incident Graph component -->
+  <section id="total-incident-graph"></section>
 
   <!-- Background Layer -->
   <section id="content">
@@ -67,7 +73,7 @@
   <section id="text-section" class="text-section">
     <div class="text-container">
       <div class="text-box">
-        <p>The map reveals where aid work is most dangerous. However, the map alone will not answer everything. It doesn’t tell us who is being targeted. It doesn’t show how attacks happen and it doesn’t explain why some workers are more vulnerable than others. That’s what we’ll look at next.</p>
+        <p>The map reveals where aid work is most dangerous. However, the map alone will not answer everything. It doesn't tell us who is being targeted. It doesn't show how attacks happen and it doesn't explain why some workers are more vulnerable than others. That's what we'll look at next.</p>
       </div>
     </div>
   </section>
