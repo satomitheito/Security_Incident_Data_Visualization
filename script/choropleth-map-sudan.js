@@ -1,25 +1,30 @@
 d3.csv("../data/security_incidents.csv").then(data => {
     const incidentsByCountry = {};
+    const sageGreenCountries = {};
   
-    // Group by country name
+    // Group by country name and set all countries to sage green except Sudan
     data.forEach(d => {
       if (d["Country"]) {
         const country = d["Country"];
-        incidentsByCountry[country] = (incidentsByCountry[country] || 0) + 1;
+        // Only count incidents for Sudan
+        if (country === "Sudan") {
+          incidentsByCountry[country] = (incidentsByCountry[country] || 0) + 1;
+        }
+        // Set all other countries to 1 for sage green
+        sageGreenCountries[country] = 1;
       }
     });
-  
-    // Prepare data for Plotly
-    const locations = Object.keys(incidentsByCountry);
-    const zValues = Object.values(incidentsByCountry);
-    const textValues = locations.map((country, i) => `${country}: ${zValues[i]} incidents`);
-  
-    const plotData = [{
+
+    // Delete Sudan from sageGreenCountries to prevent overlap
+    delete sageGreenCountries["Sudan"];
+    
+    // Create arrays for both datasets
+    const sudanData = [{
       type: 'choropleth',
-      locationmode: 'country names', // ← same as your Python code
-      locations: locations,
-      z: zValues,
-      text: textValues,
+      locationmode: 'country names',
+      locations: Object.keys(incidentsByCountry),
+      z: Object.values(incidentsByCountry),
+      text: Object.keys(incidentsByCountry).map(country => `${country}: ${incidentsByCountry[country]} incidents`),
       colorscale: [
         [0, '#ffebe6'],    // Lightest red
         [0.2, '#ffb3b3'],  // Light red
@@ -36,11 +41,30 @@ d3.csv("../data/security_incidents.csv").then(data => {
         }
       },
       hovertemplate: 
-        "<b style='font-size: 16px; color: #ffffff; background-color: rgba(255,255,255,0.9)'>%{location}</b><br>" +
+        "<b style='font-size: 16px; color: #000000; background-color: rgba(255,255,255,0.9)'>%{location}</b><br>" +
         "<span style='font-size: 14px; background-color: rgba(255,255,255,0.9)'>Incidents: <b>%{z}</b></span>" +
         "<extra></extra>",
       zmin: 0
     }];
+
+    const sageGreenData = [{
+      type: 'choropleth',
+      locationmode: 'country names',
+      locations: Object.keys(sageGreenCountries),
+      z: Object.values(sageGreenCountries),
+      colorscale: [[0, '#8A9A5B'], [1, '#8A9A5B']], // Sage green for all countries
+      showscale: false,
+      marker: {
+        line: {
+          color: '#999999',
+          width: 1.5
+        }
+      },
+      hovertemplate: "<extra></extra>",  // Empty hover template
+      zmin: 0
+    }];
+
+    const plotData = [...sageGreenData, ...sudanData];  // Combine both datasets, Sudan on top
   
     const layout = {
       geo: {
@@ -49,10 +73,10 @@ d3.csv("../data/security_incidents.csv").then(data => {
         },
         showland: true,
         showcoastlines: false,  // Remove coastlines
-        landcolor: '#8A9A5B',   // Changed from #ffffff to #dedede
+        landcolor: '#dedede',   // Light gray for uncovered areas
         showframe: false,
         showcountries: true,
-        bgcolor: '#dedede',     // Changed from rgba(0,0,0,0) to #dedede
+        bgcolor: '#dedede',     // Light gray background
         margin: { t: 0, b: 0, l: 0, r: 0 },
         lataxis: {
           range: [-55, 80],
