@@ -11,6 +11,8 @@ class TotalIncidentGraph {
     // Store data and state
     this.fullYears = [];
     this.fullIncidents = [];
+    this.fullDeaths = [];
+    this.fullAffected = [];
     this.currentVisibleYears = 1;
     this.graphContainer = null;
     this.isInitialized = false;
@@ -60,6 +62,8 @@ class TotalIncidentGraph {
       }).data;
       
       const yearlyIncidents = {};
+      const yearlyDeaths = {};
+      const yearlyAffected = {};
       
       // Process each row in the parsed data
       for (let i = 0; i < parsedData.length; i++) {
@@ -76,15 +80,40 @@ class TotalIncidentGraph {
         const year = parseInt(yearValue);
         
         if (!isNaN(year) && year <= 2024) {
+          // Count incidents
           yearlyIncidents[year] = (yearlyIncidents[year] || 0) + 1;
+          
+          // Extract and sum deaths
+          let deaths = 0;
+          for (const key in row) {
+            if (key.includes("Total killed")) {
+              const deathCount = parseInt(row[key]) || 0;
+              deaths += deathCount;
+            }
+          }
+          yearlyDeaths[year] = (yearlyDeaths[year] || 0) + deaths;
+          
+          // Extract and sum affected personnel
+          let affected = 0;
+          for (const key in row) {
+            if (key.includes("Total affected")) {
+              const affectedCount = parseInt(row[key]) || 0;
+              affected += affectedCount;
+            }
+          }
+          yearlyAffected[year] = (yearlyAffected[year] || 0) + affected;
         }
       }
       
       const years = Object.keys(yearlyIncidents).map(Number).sort((a, b) => a - b);
       const incidents = years.map(year => yearlyIncidents[year]);
+      const deaths = years.map(year => yearlyDeaths[year]);
+      const affected = years.map(year => yearlyAffected[year]);
       
       this.fullYears = years;
       this.fullIncidents = incidents;
+      this.fullDeaths = deaths;
+      this.fullAffected = affected;
       
       // Define historical context for key years
       this.historicalContext = {
@@ -110,10 +139,10 @@ class TotalIncidentGraph {
         }
       };
       
-      return { years, incidents };
+      return { years, incidents, deaths, affected };
     } catch (error) {
       console.error('Error processing CSV data:', error);
-      return { years: [], incidents: [] };
+      return { years: [], incidents: [], deaths: [], affected: [] };
     }
   }
 
@@ -131,7 +160,7 @@ class TotalIncidentGraph {
     }
     
     try {
-      const { years, incidents } = await this.processData();
+      const { years, incidents, deaths, affected } = await this.processData();
       
       if (years.length === 0) {
         this.graphContainer.innerHTML = '<p>No data available</p>';
@@ -147,7 +176,8 @@ class TotalIncidentGraph {
         line: { width: 3, color: '#ffffff' },
         fill: 'tozeroy',
         fillcolor: 'rgba(255, 255, 255, 0.2)',
-        hovertemplate: '%{x} - %{y} incidents<extra></extra>'
+        customdata: [[deaths[0], affected[0]]],
+        hovertemplate: '<b>%{x}</b><br>Incidents: %{y}<br>Deaths: %{customdata[0]}<br>Affected Personnel: %{customdata[1]}<extra></extra>'
       };
       
       const layout = {
@@ -282,6 +312,11 @@ class TotalIncidentGraph {
     
     const updatedX = this.fullYears.slice(0, visibleYears);
     const updatedY = this.fullIncidents.slice(0, visibleYears);
+    const updatedDeaths = this.fullDeaths.slice(0, visibleYears);
+    const updatedAffected = this.fullAffected.slice(0, visibleYears);
+    
+    // Create customdata array for the hover template
+    const customdata = updatedDeaths.map((death, index) => [death, updatedAffected[index]]);
     
     // Get the most recent year shown on graph
     const currentYear = updatedX[updatedX.length - 1];
@@ -296,7 +331,8 @@ class TotalIncidentGraph {
       data: [{ 
         x: updatedX, 
         y: updatedY,
-        hovertemplate: '%{x} - %{y} incidents<extra></extra>'
+        customdata: customdata,
+        hovertemplate: '<b>%{x}</b><br>Incidents: %{y}<br>Deaths: %{customdata[0]}<br>Affected Personnel: %{customdata[1]}<extra></extra>'
       }]
     }, {
       transition: { duration: 30, easing: 'cubic-out' },
