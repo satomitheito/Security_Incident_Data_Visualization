@@ -1,4 +1,4 @@
-d3.csv("../data/security_incidents.csv").then(data => {
+d3.csv("data/security_incidents.csv").then(data => {
     // Organize data by year and country
     const incidentsByYearAndCountry = {};
     const killedByYearAndCountry = {};

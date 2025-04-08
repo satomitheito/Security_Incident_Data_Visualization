@@ -1,4 +1,4 @@
-d3.csv("../data/security_incidents.csv").then(data => {
+d3.csv("data/security_incidents.csv").then(data => {
     const incidentsByCountry = {};
   
     // Group by country name

@@ -52,7 +52,7 @@ class TotalIncidentGraph {
 
   async processData() {
     try {
-      const response = await fetch('/data/security_incidents.csv');
+      const response = await fetch('data/security_incidents.csv');
       const csvData = await response.text();
       
       // Use Papa Parse instead of custom parsing
