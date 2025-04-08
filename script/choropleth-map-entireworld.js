@@ -1,18 +1,32 @@
 d3.csv("../data/security_incidents.csv").then(data => {
     const incidentsByCountry = {};
+    const killedByCountry = {};
+    const affectedByCountry = {};
   
     // Group by country name
     data.forEach(d => {
       if (d["Country"]) {
         const country = d["Country"];
         incidentsByCountry[country] = (incidentsByCountry[country] || 0) + 1;
+        
+        // Sum up total killed
+        const killed = parseInt(d["Total killed"]) || 0;
+        killedByCountry[country] = (killedByCountry[country] || 0) + killed;
+        
+        // Sum up total affected
+        const affected = parseInt(d["Total affected"]) || 0;
+        affectedByCountry[country] = (affectedByCountry[country] || 0) + affected;
       }
     });
   
     // Prepare data for Plotly
     const locations = Object.keys(incidentsByCountry);
     const zValues = Object.values(incidentsByCountry);
-    const textValues = locations.map((country, i) => `${country}: ${zValues[i]} incidents`);
+    const killedValues = locations.map(country => killedByCountry[country] || 0);
+    const affectedValues = locations.map(country => affectedByCountry[country] || 0);
+    const textValues = locations.map((country, i) => 
+      `${country}: ${zValues[i]} incidents, ${killedValues[i]} killed, ${affectedValues[i]} affected`
+    );
   
     const plotData = [{
       type: 'choropleth',
@@ -20,6 +34,10 @@ d3.csv("../data/security_incidents.csv").then(data => {
       locations: locations,
       z: zValues,
       text: textValues,
+      customdata: locations.map((country, i) => ({
+        killed: killedValues[i],
+        affected: affectedValues[i]
+      })),
       colorscale: [
         [0, '#ffebe6'],    // Lightest red
         [0.2, '#ffb3b3'],  // Light red
@@ -37,7 +55,9 @@ d3.csv("../data/security_incidents.csv").then(data => {
       },
       hovertemplate: 
         "<b style='font-size: 16px; color: #ffffff; background-color: rgba(255,255,255,0.9)'>%{location}</b><br>" +
-        "<span style='font-size: 14px; background-color: rgba(255,255,255,0.9)'>Incidents: <b>%{z}</b></span>" +
+        "<span style='font-size: 14px; background-color: rgba(255,255,255,0.9)'>Incidents: <b>%{z}</b></span><br>" +
+        "<span style='font-size: 14px; background-color: rgba(255,255,255,0.9)'>Deaths: <b>%{customdata.killed}</b></span><br>" +
+        "<span style='font-size: 14px; background-color: rgba(255,255,255,0.9)'>Personnel affected: <b>%{customdata.affected}</b></span>" +
         "<extra></extra>",
       zmin: 0
     }];
@@ -229,13 +249,48 @@ d3.csv("../data/security_incidents.csv").then(data => {
       const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
 
       if (isVisible) {
-        // Calculate which text section to show based on scroll position
-        const sectionHeight = highlightSection.offsetHeight;
-        const scrollPosition = Math.abs(rect.top);
-        const sectionIndex = Math.min(
-          Math.floor((scrollPosition / sectionHeight) * textSections.length),
-          textSections.length - 1
-        );
+        // Calculate normalized position within the viewable area (0 to 1)
+        // When element first enters view from bottom: normalized = 0
+        // When element is about to exit view from top: normalized = 1
+        const totalHeight = highlightSection.offsetHeight;
+        const viewportHeight = window.innerHeight;
+        
+        // Calculate how much of the section has been scrolled past
+        // This will be negative when the section is below viewport, then 0 to totalHeight as we scroll through
+        const scrolledPast = viewportHeight - rect.top;
+        
+        // Normalize to 0-1 range based on how far through the section we've scrolled
+        const normalizedScroll = Math.max(0, Math.min(1, scrolledPast / (totalHeight + viewportHeight)));
+        
+        // Define thresholds for each country
+        const thresholds = [
+          0.35,  // Show main map until 25% scrolled
+          0.55,   // Show Sudan from 25% to 50%
+          0.7   // Show Syria from 50% to 75%, Somalia after 75%
+        ];
+        
+        // Determine which section to show
+        let sectionIndex = 0;
+        let currentCountry = '';
+        
+        if (normalizedScroll < thresholds[0]) {
+          // Show main map
+          document.getElementById('map-container').style.display = 'block';
+          document.getElementById('sudan-map-container').style.display = 'none';
+          document.getElementById('syria-map-container').style.display = 'none';
+          document.getElementById('somalia-map-container').style.display = 'none';
+          infoBox.classList.remove('visible');
+          return;
+        } else if (normalizedScroll < thresholds[1]) {
+          sectionIndex = 0; // Sudan
+          currentCountry = 'sudan';
+        } else if (normalizedScroll < thresholds[2]) {
+          sectionIndex = 1; // Syria
+          currentCountry = 'syria';
+        } else {
+          sectionIndex = 2; // Somalia
+          currentCountry = 'somalia';
+        }
 
         // Update text content
         infoBox.innerHTML = `
@@ -243,9 +298,6 @@ d3.csv("../data/security_incidents.csv").then(data => {
           <p>${textSections[sectionIndex].content}</p>
         `;
 
-        // Determine which map to show based on the current section
-        const currentCountry = textSections[sectionIndex].country;
-        
         // Update info box color based on country
         const colors = {
           'sudan': '#6d029c',
@@ -269,30 +321,18 @@ d3.csv("../data/security_incidents.csv").then(data => {
           document.getElementById('somalia-map-container').style.display = 'block';
         }
 
-        // Update map data to disable interactions
-        const noInteractionData = {
-          hoverinfo: 'skip',
-          hoverlabel: { bgcolor: 'transparent' },
-          enableMouseEvents: false
-        };
-        
-        if (currentCountry === 'sudan') {
-          Plotly.update('sudan-map-container', noInteractionData, mainLayout);
-        } else if (currentCountry === 'syria') {
-          Plotly.update('syria-map-container', noInteractionData, mainLayout);
-        } else if (currentCountry === 'somalia') {
-          Plotly.update('somalia-map-container', noInteractionData, mainLayout);
-        }
+        // Show info box
+        infoBox.classList.add('visible');
       } else {
         // Show main map when section is not visible
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('sudan-map-container').style.display = 'none';
         document.getElementById('syria-map-container').style.display = 'none';
         document.getElementById('somalia-map-container').style.display = 'none';
+        
+        // Hide info box
+        infoBox.classList.remove('visible');
       }
-      
-      // Toggle info box visibility
-      infoBox.classList.toggle('visible', isVisible);
     });
 
     // Add window resize event listener to update map sizes

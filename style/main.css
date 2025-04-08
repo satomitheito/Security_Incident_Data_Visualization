@@ -364,3 +364,8 @@ body.scroll-hijacked {
   margin: 0 auto;
   padding: 20px;
 }
+
+/* Add this to your CSS */
+.highlight-section {
+  height: 250vh; /* Make it 3 times the viewport height */
+}
