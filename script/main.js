@@ -24,9 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const genderGraph = new GenderComparisonGraph('gender-graph');
   genderGraph.render();
 
-  const rolesGraph = new RolesBarGraph('roles-graph');
-  rolesGraph.render();
-
+  // const rolesGraph = new RolesBarGraph('roles-graph');
+  // rolesGraph.render();
   const wordCloud = new WordCloud('word-cloud-container');
   wordCloud.render();
+
+  const locationChart = new LocationChart('location-chart-container')
+  locationChart.render();
 }); 

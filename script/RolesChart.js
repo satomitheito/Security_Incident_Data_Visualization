@@ -183,8 +183,8 @@ class RolesBarGraph {
         l: 330,  // Increased left margin for y-axis labels
         pad: 4
       },
-      plot_bgcolor: 'rgba(138, 154, 91, 1)',
-      paper_bgcolor: 'rgba(138, 154, 91, 1)',
+      plot_bgcolor: '#8A9A5B',
+      paper_bgcolor: '#8A9A5B',
       height: 500,
       bargap: 0.3,
       showlegend: false

@@ -252,7 +252,7 @@ h2 {
 
 .graph-container {
   width: 85%;
-  height: 450px;
+  height: 600px;
   margin: 0 auto;
   background-color: #8A9A5B;
   border-radius: 8px;
@@ -322,18 +322,18 @@ body.scroll-hijacked {
   margin-bottom: 30px;
 }
 
-#roles-graph {
+#location-chart-container {
   position: relative;
   z-index: 3;
   background-color: #8A9A5B;
   padding: 60px 0 200px 0;
 }
 
-.roles-graph {
+.location-chart-container {
   background-color: #8A9A5B;
 }
 
-.roles-graph-section h2 {
+.location-chart-container-section h2 {
   text-align: center;
   color: #430101;
   margin-bottom: 30px;
@@ -365,7 +365,65 @@ body.scroll-hijacked {
   padding: 20px;
 }
 
-/* Add this to your CSS */
-.highlight-section {
-  height: 400vh; /* Make it 3 times the viewport height */
+.takeaway-section {
+  background-color: rgba(138, 154, 91);
+  padding: 60px 0;
+  margin: 40px 0;
+}
+
+.takeaway-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.takeaway-title {
+  color: rgb(138, 154, 91);
+  font-size: 2.5em;
+  text-align: center;
+  margin-bottom: 40px;
+  font-family: 'Libre Franklin', sans-serif;
+  font-weight: 700;
+}
+
+.takeaway-content {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Libre Franklin', sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+.large-initial {
+  float: left;
+  font-size: 5em;
+  line-height: 0.8;
+  padding-right: 8px;
+  color: rgb(138, 154, 91);
+  font-family: 'Libre Franklin', sans-serif;
+  font-weight: 700;
+}
+
+.takeaway-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.takeaway-list li {
+  margin-bottom: 15px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.takeaway-list li:before {
+  content: "•";
+  color: rgb(138, 154, 91);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+.takeaway-text {
+  font-size: 1.1em;
+  text-align: justify;
 }

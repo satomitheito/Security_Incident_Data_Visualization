@@ -129,6 +129,12 @@ class GenderComparisonGraph {
     
     // Initial graph with 'All' countries
     this.updateGraph('All');
+
+    // Add resize observer for the container
+    const resizeObserver = new ResizeObserver(() => {
+      this.updateGraph(document.getElementById('country-select').value);
+    });
+    resizeObserver.observe(this.graphContainer);
   }
 
   updateGraph(country) {
@@ -148,12 +154,19 @@ class GenderComparisonGraph {
       }
     };
     
+    const containerWidth = this.graphContainer.clientWidth;
+    
+    // Calculate responsive margins based on container width
+    const leftMargin = Math.min(150, containerWidth * 0.1); // Further reduced from 200px to 150px and from 15% to 10%
+    const rightMargin = Math.min(80, containerWidth * 0.1);
+    
     const layout = {
       xaxis: {
         color: 'white',
         titlefont: { color: 'white', family: 'Libre Franklin', weight: 600 },
         tickfont: { color: 'white', family: 'Libre Franklin', size: 14, weight: 600 },
-        showgrid: false
+        showgrid: false,
+        automargin: true
       },
       yaxis: {
         title: 'Number of Victims',
@@ -161,18 +174,21 @@ class GenderComparisonGraph {
         titlefont: { color: 'white', family: 'Libre Franklin', weight: 600 },
         tickfont: { color: 'white', family: 'Libre Franklin', size: 14, weight: 600 },
         showgrid: false,
-        range: [0, Math.max(...trace.y) * 1.1]
+        range: [0, Math.max(...trace.y) * 1.1],
+        automargin: true // Enable automatic margin adjustment
       },
       margin: {
-        t: 20,
-        r: 50,
-        b: 80,
-        l: 300,
-        pad: 10
+        t: 30,
+        r: rightMargin,
+        b: 150,
+        l: leftMargin,
+        pad: 10,
+        autoexpand: true // Allow margins to expand if needed
       },
       plot_bgcolor: 'rgba(138, 154, 91, 1)',
       paper_bgcolor: 'rgba(138, 154, 91, 1)',
       height: 500,
+      width: containerWidth,
       bargap: 0.3,
       showlegend: false
     };
