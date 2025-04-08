@@ -30,7 +30,15 @@ class TotalIncidentGraph {
       <div class="total-incident-graph-section">
         <div class="container">
           <p class="graph-title">Total Incidents By Year</p>
-          <div class="graph-container" id="incidents-graph"></div>
+          <div class="graph-flex-container">
+            <div class="graph-container" id="incidents-graph"></div>
+            <div class="context-box" id="incident-context-box">
+              <h3 class="context-title">Historical Context</h3>
+              <div class="context-content">
+                <p>Scroll through the timeline to see key events in humanitarian security.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -77,6 +85,30 @@ class TotalIncidentGraph {
       
       this.fullYears = years;
       this.fullIncidents = incidents;
+      
+      // Define historical context for key years
+      this.historicalContext = {
+        2003: {
+          title: "UN Baghdad Headquarters Bombing",
+          keyDriver: "The bombing of the UN headquarters at the Canal Hotel in Baghdad (August 2003) was a watershed moment in humanitarian security. The attack killed the UN Special Representative in Iraq (Sérgio Vieira de Mello) and over 20 others, underscoring a new era in which aid workers and their offices became explicit targets.",
+          context: "The U.S.-led invasion of Iraq in March 2003 triggered a surge in violence and instability. Humanitarian personnel found themselves on the front lines in a fluid insurgent environment with declining acceptance from armed groups."
+        },
+        2008: {
+          title: "Increased Attacks in Afghanistan and Somalia",
+          keyDriver: "Marked increases in attacks against aid workers in Afghanistan and Somalia, among other conflict-affected areas.",
+          context: "The \"global war on terror\" was still in full swing, with Afghanistan seeing escalating Taliban attacks. Somalia's security environment deteriorated significantly following the Ethiopian intervention (2006–2009), leading to kidnappings and targeted killings of aid staff."
+        },
+        2013: {
+          title: "Peak Violence in Multiple Regions",
+          keyDriver: "Peak in recorded violent incidents against humanitarian workers in several theaters, including Syria, Afghanistan, and parts of East Africa.",
+          context: "By 2013, the Syrian civil war was well underway. Aid workers delivering assistance in opposition-held or contested areas faced abductions, shelling, and crossfire incidents. Simultaneously, Afghanistan continued to experience high casualty rates among humanitarian staff."
+        },
+        2022: {
+          title: "Ukraine Conflict and Global Emergencies",
+          keyDriver: "Large-scale, high-intensity conflict in Ukraine and continued complex emergencies elsewhere.",
+          context: "Russia's invasion of Ukraine in February 2022 set off a massive humanitarian response in an active warzone, where front lines shifted rapidly. Humanitarian workers in Ukraine faced threats from shelling, the dangers of operating close to major combat operations, and the logistical challenges of accessing communities under occupation or siege. Meanwhile, countries such as Yemen, Ethiopia (Tigray region), and Myanmar also continued to see high security risks for aid providers."
+        }
+      };
       
       return { years, incidents };
     } catch (error) {
@@ -147,7 +179,8 @@ class TotalIncidentGraph {
         dragmode: false,
         plot_bgcolor: '#8A9A5B',
         paper_bgcolor: '#8A9A5B',
-        font: { color: 'white', family: 'Libre Franklin' }
+        font: { color: 'white', family: 'Libre Franklin' },
+        annotations: [],  // We'll populate this in updateGraph
       };
       
       const config = {
@@ -164,6 +197,74 @@ class TotalIncidentGraph {
       
       Plotly.newPlot(this.graphContainer, [initialTrace], layout, config);
       this.isInitialized = true;
+      
+      // Add event listener for clicking on annotations (stars)
+      this.graphContainer.on('plotly_clickannotation', (eventData) => {
+        // Extract year from the x coordinate of the clicked annotation
+        const clickedYear = eventData.annotation.x;
+        
+        // Update context box for the clicked year
+        if (this.historicalContext[clickedYear]) {
+          this.updateContextBoxForYear(clickedYear);
+        }
+      });
+      
+      // Add some additional CSS for our new elements
+      const style = document.createElement('style');
+      style.textContent = `
+        .graph-flex-container {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 20px;
+          align-items: stretch;
+          padding-right: 15px;
+        }
+        
+        .graph-container {
+          flex: 3;
+          min-width: 300px;
+        }
+        
+        .context-box {
+          flex: 1;
+          min-width: 250px;
+          background-color: rgba(0, 0, 0, 0.7);
+          border: 1px solid #FFD700;
+          border-radius: 5px;
+          padding: 20px;
+          margin-right: 15px;
+          color: white;
+          height: auto;
+          transition: all 0.3s ease;
+          box-sizing: border-box;
+        }
+        
+        .context-box.active {
+          box-shadow: 0 0 10px #FFD700;
+        }
+        
+        .context-title {
+          margin-top: 0;
+          color: #FFD700;
+          border-bottom: 1px solid #FFD700;
+          padding-bottom: 8px;
+          font-family: 'Libre Franklin', sans-serif;
+        }
+        
+        .context-content h4 {
+          color: #FFD700;
+          margin: 10px 0 5px;
+          font-family: 'Libre Franklin', sans-serif;
+        }
+        
+        .context-content p {
+          margin: 0 0 10px;
+          line-height: 1.4;
+          font-family: 'Libre Franklin', sans-serif;
+        }
+      `;
+      document.head.appendChild(style);
       
     } catch (error) {
       console.error('Error rendering graph:', error);
@@ -182,6 +283,15 @@ class TotalIncidentGraph {
     const updatedX = this.fullYears.slice(0, visibleYears);
     const updatedY = this.fullIncidents.slice(0, visibleYears);
     
+    // Get the most recent year shown on graph
+    const currentYear = updatedX[updatedX.length - 1];
+    
+    // Update context box if it's a key year
+    this.updateContextBox(currentYear);
+    
+    // Create annotations for key years
+    const annotations = this.createKeyYearAnnotations(updatedX, updatedY);
+    
     Plotly.animate(this.graphContainer, {
       data: [{ 
         x: updatedX, 
@@ -192,6 +302,103 @@ class TotalIncidentGraph {
       transition: { duration: 30, easing: 'cubic-out' },
       frame: { duration: 30 }
     });
+    
+    // Update annotations
+    Plotly.relayout(this.graphContainer, {
+      annotations: annotations
+    });
+  }
+  
+  updateContextBox(currentYear) {
+    const contextBox = document.getElementById('incident-context-box');
+    if (!contextBox) return;
+    
+    // Find the nearest key year less than or equal to current year
+    const keyYears = Object.keys(this.historicalContext).map(Number).sort((a, b) => a - b);
+    let relevantYear = null;
+    
+    for (let i = 0; i < keyYears.length; i++) {
+      if (keyYears[i] <= currentYear) {
+        relevantYear = keyYears[i];
+      } else {
+        break;
+      }
+    }
+    
+    if (relevantYear && this.historicalContext[relevantYear]) {
+      this.updateContextBoxForYear(relevantYear);
+    } else {
+      contextBox.innerHTML = `
+        <h3 class="context-title">Historical Context</h3>
+        <div class="context-content">
+          <p>Scroll through the timeline to see key events in humanitarian security.</p>
+        </div>
+      `;
+      contextBox.classList.remove('active');
+    }
+  }
+  
+  // New method to update context box for a specific year
+  updateContextBoxForYear(year) {
+    const contextBox = document.getElementById('incident-context-box');
+    if (!contextBox || !this.historicalContext[year]) return;
+    
+    const context = this.historicalContext[year];
+    contextBox.innerHTML = `
+      <h3 class="context-title">${year}: ${context.title}</h3>
+      <div class="context-content">
+        <h4>Key Driver</h4>
+        <p>${context.keyDriver}</p>
+        <h4>Context</h4>
+        <p>${context.context}</p>
+      </div>
+    `;
+    contextBox.classList.add('active');
+    
+    // Add a visual highlight effect when clicking a star
+    contextBox.classList.add('highlight');
+    setTimeout(() => {
+      contextBox.classList.remove('highlight');
+    }, 500);
+  }
+  
+  createKeyYearAnnotations(visibleYears, visibleIncidents) {
+    const annotations = [];
+    
+    // Only add annotations for key years that are currently visible
+    Object.keys(this.historicalContext).forEach(year => {
+      const numYear = parseInt(year);
+      const yearIndex = visibleYears.indexOf(numYear);
+      
+      if (yearIndex !== -1) {
+        annotations.push({
+          x: numYear,
+          y: visibleIncidents[yearIndex],
+          xref: 'x',
+          yref: 'y',
+          text: '★',
+          showarrow: true,
+          arrowhead: 2,
+          arrowsize: 1,
+          arrowwidth: 2,
+          arrowcolor: '#FFD700',
+          font: {
+            color: '#FFD700',
+            size: 16
+          },
+          align: 'center',
+          bgcolor: 'rgba(0,0,0,0.7)',
+          bordercolor: '#FFD700',
+          borderwidth: 1,
+          borderpad: 4,
+          opacity: 0.8,
+          clicktoshow: false, // Ensure clicking doesn't toggle visibility
+          captureevents: true // Ensure clicks are captured
+        });
+      }
+    });
+    
+    return annotations;
   }
   
   enableScrollHijacking() {
