@@ -185,7 +185,7 @@ class TotalIncidentGraph {
           title: 'Year',
           tickmode: 'linear',
           tick0: Math.min(...years),
-          dtick: 1,
+          dtick: 2,
           range: [Math.min(...years), 2024],
           color: 'white',
           titlefont: { color: 'white', family: 'Libre Franklin' },
