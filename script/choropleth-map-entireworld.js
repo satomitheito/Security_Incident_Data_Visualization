@@ -294,7 +294,7 @@ d3.csv("../data/security_incidents.csv").then(data => {
         }
         
         // Show or hide the hint based on scroll position
-        if (normalizedScroll >= 0.05 && normalizedScroll < 0.30) {
+        if (normalizedScroll >= 0.02 && normalizedScroll < 0.30) {
           hoverHint.style.opacity = '1';
         } else {
           hoverHint.style.opacity = '0';
