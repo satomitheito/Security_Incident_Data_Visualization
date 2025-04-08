@@ -544,3 +544,7 @@ body.scroll-hijacked {
   color: #8A9A5B;
   border-bottom-color: #8A9A5B;
 }
+
+.highlight-section {
+  height: 300vh;
+}

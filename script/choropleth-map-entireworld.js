@@ -1,24 +1,68 @@
 d3.csv("../data/security_incidents.csv").then(data => {
+    // Organize data by year and country
+    const incidentsByYearAndCountry = {};
+    const killedByYearAndCountry = {};
+    const affectedByYearAndCountry = {};
+    const availableYears = new Set();
+    
+    // Group by year and country name
+    data.forEach(d => {
+      if (d["Country"] && d["Year"]) {
+        const country = d["Country"];
+        const year = parseInt(d["Year"]);
+        
+        if (!isNaN(year)) {
+          availableYears.add(year);
+          
+          // Initialize year objects if they don't exist
+          if (!incidentsByYearAndCountry[year]) {
+            incidentsByYearAndCountry[year] = {};
+            killedByYearAndCountry[year] = {};
+            affectedByYearAndCountry[year] = {};
+          }
+          
+          // Count incidents by year and country
+          incidentsByYearAndCountry[year][country] = (incidentsByYearAndCountry[year][country] || 0) + 1;
+          
+          // Sum up total killed by year and country
+          const killed = parseInt(d["Total killed"]) || 0;
+          killedByYearAndCountry[year][country] = (killedByYearAndCountry[year][country] || 0) + killed;
+          
+          // Sum up total affected by year and country
+          const affected = parseInt(d["Total affected"]) || 0;
+          affectedByYearAndCountry[year][country] = (affectedByYearAndCountry[year][country] || 0) + affected;
+        }
+      }
+    });
+    
+    // Create aggregate data (all years) for initial view
     const incidentsByCountry = {};
     const killedByCountry = {};
     const affectedByCountry = {};
   
-    // Group by country name
-    data.forEach(d => {
-      if (d["Country"]) {
-        const country = d["Country"];
-        incidentsByCountry[country] = (incidentsByCountry[country] || 0) + 1;
-        
-        // Sum up total killed
-        const killed = parseInt(d["Total killed"]) || 0;
-        killedByCountry[country] = (killedByCountry[country] || 0) + killed;
-        
-        // Sum up total affected
-        const affected = parseInt(d["Total affected"]) || 0;
-        affectedByCountry[country] = (affectedByCountry[country] || 0) + affected;
-      }
+    // Aggregate data across all years
+    Object.values(incidentsByYearAndCountry).forEach(yearData => {
+      Object.entries(yearData).forEach(([country, count]) => {
+        incidentsByCountry[country] = (incidentsByCountry[country] || 0) + count;
+      });
     });
-  
+    
+    Object.values(killedByYearAndCountry).forEach(yearData => {
+      Object.entries(yearData).forEach(([country, count]) => {
+        killedByCountry[country] = (killedByCountry[country] || 0) + count;
+      });
+    });
+    
+    Object.values(affectedByYearAndCountry).forEach(yearData => {
+      Object.entries(yearData).forEach(([country, count]) => {
+        affectedByCountry[country] = (affectedByCountry[country] || 0) + count;
+      });
+    });
+    
+    // Sort years chronologically
+    const yearsList = Array.from(availableYears).sort((a, b) => a - b);
+    let selectedYear = null; // No year filter initially (show all data)
+    
     // Prepare data for Plotly
     const locations = Object.keys(incidentsByCountry);
     const zValues = Object.values(incidentsByCountry);
@@ -80,6 +124,210 @@ d3.csv("../data/security_incidents.csv").then(data => {
       name: ''
     }];
 
+    // Create year slider
+    const createYearSlider = () => {
+      const timelineContainer = document.createElement('div');
+      timelineContainer.id = 'timeline-container';
+      timelineContainer.style.cssText = `
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-family: sans-serif;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        backdrop-filter: blur(3px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      `;
+      
+      const sliderLabel = document.createElement('div');
+      sliderLabel.style.cssText = `
+        font-size: 14px;
+        margin-bottom: 6px;
+        font-weight: bold;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+      `;
+      
+      const minYearLabel = document.createElement('span');
+      minYearLabel.textContent = '1997';
+      minYearLabel.style.cssText = `
+        opacity: 0.7;
+        font-size: 12px;
+      `;
+      
+      const yearDisplay = document.createElement('span');
+      yearDisplay.id = 'year-display';
+      yearDisplay.textContent = 'All Years (1997-2024)';
+      yearDisplay.style.cssText = `
+        color: #ffcc00;
+        font-size: 16px;
+      `;
+      
+      const maxYearLabel = document.createElement('span');
+      maxYearLabel.textContent = '2024';
+      maxYearLabel.style.cssText = `
+        opacity: 0.7;
+        font-size: 12px;
+      `;
+      
+      sliderLabel.appendChild(minYearLabel);
+      sliderLabel.appendChild(yearDisplay);
+      sliderLabel.appendChild(maxYearLabel);
+      
+      const sliderContainer = document.createElement('div');
+      sliderContainer.style.cssText = `
+        width: 100%;
+        display: flex;
+        align-items: center;
+      `;
+      
+      const slider = document.createElement('input');
+      slider.type = 'range';
+      slider.min = 1997;
+      slider.max = 2024;
+      slider.step = 1;
+      slider.value = 0; // Special value for "all years"
+      slider.style.cssText = `
+        width: 100%;
+        margin: 0 10px;
+        cursor: pointer;
+        height: 4px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 2px;
+        outline: none;
+      `;
+      
+      // Add custom styles for the slider thumb
+      const thumbStyles = `
+        slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: #ffcc00;
+          cursor: pointer;
+        }
+        
+        slider::-moz-range-thumb {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: #ffcc00;
+          cursor: pointer;
+          border: none;
+        }
+      `;
+      
+      // Add style element to document
+      const styleElement = document.createElement('style');
+      styleElement.textContent = thumbStyles.replace(/slider/g, '#' + slider.id);
+      document.head.appendChild(styleElement);
+      
+      // Give slider an ID for the custom styles
+      slider.id = 'year-slider';
+      
+      const resetButton = document.createElement('button');
+      resetButton.textContent = 'All';
+      resetButton.style.cssText = `
+        background-color: rgba(85, 85, 85, 0.7);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 3px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-left: 10px;
+        transition: background-color 0.3s;
+      `;
+      resetButton.onmouseover = () => { resetButton.style.backgroundColor = 'rgba(120, 120, 120, 0.7)'; };
+      resetButton.onmouseout = () => { resetButton.style.backgroundColor = 'rgba(85, 85, 85, 0.7)'; };
+      
+      sliderContainer.appendChild(slider);
+      sliderContainer.appendChild(resetButton);
+      
+      timelineContainer.appendChild(sliderLabel);
+      timelineContainer.appendChild(sliderContainer);
+      
+      document.getElementById('map-container').parentNode.appendChild(timelineContainer);
+      
+      // Add event listener to slider
+      slider.addEventListener('input', (e) => {
+        const year = parseInt(e.target.value);
+        yearDisplay.textContent = year;
+        updateMapForYear(year);
+      });
+      
+      // Add event listener to reset button
+      resetButton.addEventListener('click', () => {
+        slider.value = 0;
+        yearDisplay.textContent = 'All Years (1997-2024)';
+        updateMapForYear(null);
+      });
+      
+      return timelineContainer;
+    };
+    
+    // Function to update map data for a specific year
+    const updateMapForYear = (year) => {
+      selectedYear = year;
+      
+      // If null (all years), use the aggregated data
+      if (year === null) {
+        Plotly.restyle('map-container', {
+          locations: [locations],
+          z: [zValues],
+          text: [textValues],
+          customdata: [locations.map((country, i) => ({
+            killed: killedByCountry[country] || 0,
+            affected: affectedByCountry[country] || 0
+          }))]
+        });
+        return;
+      }
+      
+      // Get data for the selected year
+      const yearData = incidentsByYearAndCountry[year] || {};
+      const yearKilledData = killedByYearAndCountry[year] || {};
+      const yearAffectedData = affectedByYearAndCountry[year] || {};
+      
+      // Prepare data for the selected year
+      const yearLocations = Object.keys(yearData);
+      const yearZValues = yearLocations.map(country => yearData[country] || 0);
+      const yearKilledValues = yearLocations.map(country => yearKilledData[country] || 0);
+      const yearAffectedValues = yearLocations.map(country => yearAffectedData[country] || 0);
+      const yearTextValues = yearLocations.map((country, i) => 
+        `${country}: ${yearZValues[i]} incidents, ${yearKilledValues[i]} killed, ${yearAffectedValues[i]} affected`
+      );
+      
+      // Update the plot with the year-specific data
+      Plotly.restyle('map-container', {
+        locations: [yearLocations],
+        z: [yearZValues],
+        text: [yearTextValues],
+        customdata: [yearLocations.map((country, i) => ({
+          killed: yearKilledValues[i],
+          affected: yearAffectedValues[i]
+        }))]
+      });
+    };
+    
+    // Create the year slider UI
+    const timelineSlider = createYearSlider();
+
     const syriaData = [{
       type: 'choropleth',
       locationmode: 'country names',
@@ -121,7 +369,7 @@ d3.csv("../data/security_incidents.csv").then(data => {
         },
         showland: true,
         showcoastlines: true,
-        landcolor: '#8A9A5B',
+        landcolor: '#fffafa',
         showframe: false,
         showcountries: true,
         bgcolor: '#dedede',
@@ -296,8 +544,10 @@ d3.csv("../data/security_incidents.csv").then(data => {
         // Show or hide the hint based on scroll position
         if (normalizedScroll >= 0.02 && normalizedScroll < 0.30) {
           hoverHint.style.opacity = '1';
+          timelineSlider.style.opacity = '1';
         } else {
           hoverHint.style.opacity = '0';
+          timelineSlider.style.opacity = '0';
         }
         
         // Determine which section to show
@@ -363,6 +613,9 @@ d3.csv("../data/security_incidents.csv").then(data => {
         
         // Hide info box
         infoBox.classList.remove('visible');
+        
+        // Hide timeline slider
+        timelineSlider.style.opacity = '0';
       }
     });
 
