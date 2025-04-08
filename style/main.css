@@ -367,5 +367,5 @@ body.scroll-hijacked {
 
 /* Add this to your CSS */
 .highlight-section {
-  height: 250vh; /* Make it 3 times the viewport height */
+  height: 400vh; /* Make it 3 times the viewport height */
 }

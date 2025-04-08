@@ -264,10 +264,41 @@ d3.csv("../data/security_incidents.csv").then(data => {
         
         // Define thresholds for each country
         const thresholds = [
-          0.35,  // Show main map until 25% scrolled
-          0.55,   // Show Sudan from 25% to 50%
-          0.7   // Show Syria from 50% to 75%, Somalia after 75%
+          0.30,  // Show main map until 25% scrolled
+          0.50,   // Show Sudan from 25% to 50%
+          0.70   // Show Syria from 50% to 75%, Somalia after 75%
         ];
+        
+        // Create or show hover hint when scroll is between 0.05 and 0.35
+        let hoverHint = document.getElementById('hover-hint');
+        if (!hoverHint) {
+          hoverHint = document.createElement('div');
+          hoverHint.id = 'hover-hint';
+          hoverHint.innerHTML = 'Hover over countries to see incident details';
+          hoverHint.style.cssText = `
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            z-index: 1000;
+          `;
+          document.getElementById('map-container').parentNode.appendChild(hoverHint);
+        }
+        
+        // Show or hide the hint based on scroll position
+        if (normalizedScroll >= 0.05 && normalizedScroll < 0.30) {
+          hoverHint.style.opacity = '1';
+        } else {
+          hoverHint.style.opacity = '0';
+        }
         
         // Determine which section to show
         let sectionIndex = 0;
