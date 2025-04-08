@@ -27,13 +27,11 @@ class WordCloud {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const csvData = await response.text();
       
-      console.log('CSV data loaded, first 100 chars:', csvData.substring(0, 100));
-      
-      const rows = csvData.split('\n');
-      const headers = rows[0].split(',');
-      
-      // Find description column index
-      const descriptionIndex = headers.findIndex(h => h.toLowerCase().includes('details'));
+      // Use Papa Parse instead of custom parsing
+      const parsedData = Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true
+      }).data;
       
       // Process all descriptions
       const words = {};
@@ -44,11 +42,20 @@ class WordCloud {
         'they', 'from', 'after', 'when', 'while'
       ]);
       
-      // Skip header row
-      for (let i = 1; i < rows.length; i++) {
-        const columns = rows[i].split(',');
-        if (columns[descriptionIndex]) {
-          const description = columns[descriptionIndex].toLowerCase()
+      for (let i = 0; i < parsedData.length; i++) {
+        const row = parsedData[i];
+        
+        // Find the description field - any column containing 'details'
+        let description = '';
+        for (const key in row) {
+          if (key.toLowerCase().includes('details')) {
+            description = row[key];
+            break;
+          }
+        }
+        
+        if (description) {
+          const wordList = description.toLowerCase()
             .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()'"]/g, '') // Added quotes to remove
             .split(' ')
             .filter(word => 
@@ -57,7 +64,7 @@ class WordCloud {
               !parseInt(word) // Remove numbers
             );
             
-          description.forEach(word => {
+          wordList.forEach(word => {
             words[word] = (words[word] || 0) + 1;
           });
         }

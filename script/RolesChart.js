@@ -34,27 +34,22 @@ class RolesBarGraph {
       }
       const csvData = await response.text();
       
-      const rows = csvData.split('\n');
-      const headers = rows[0].split(',');
-      
-      // Find relevant column indices
-      const countryIndex = headers.findIndex(h => h === "Country");
-      const unIndex = headers.findIndex(h => h.includes("UN"));
-      const ingoIndex = headers.findIndex(h => h.includes("INGO"));
-      const icrcIndex = headers.findIndex(h => h.includes("ICRC"));
-      const nrcsIndex = headers.findIndex(h => h.includes("NRCS and IFRC"));
-      const nngoIndex = headers.findIndex(h => h.includes("NNGO"));
-      const otherIndex = headers.findIndex(h => h.includes("Other"));
+      // Use Papa Parse instead of custom parsing
+      const parsedData = Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true
+      }).data;
       
       // Store data by country
       const countryData = {};
       const uniqueCountries = new Set(['All']);
       
-      // Skip header row
-      for (let i = 1; i < rows.length; i++) {
-        const columns = rows[i].split(',');
+      for (let i = 0; i < parsedData.length; i++) {
+        const row = parsedData[i];
         
-        const country = columns[countryIndex]?.replace(/['"]+/g, '').trim();
+        // Get country value
+        const country = row["Country"]?.trim();
+        
         if (country && country !== '') {
           uniqueCountries.add(country);
           
@@ -69,12 +64,15 @@ class RolesBarGraph {
             };
           }
           
-          countryData[country].UN += parseInt(columns[unIndex]) || 0;
-          countryData[country].INGO += parseInt(columns[ingoIndex]) || 0;
-          countryData[country].ICRC += parseInt(columns[icrcIndex]) || 0;
-          countryData[country]['NRCS and IFRC'] += parseInt(columns[nrcsIndex]) || 0;
-          countryData[country].NNGO += parseInt(columns[nngoIndex]) || 0;
-          countryData[country].Other += parseInt(columns[otherIndex]) || 0;
+          // Find columns for different organization types
+          for (const key in row) {
+            if (key.includes("UN")) countryData[country].UN += parseInt(row[key]) || 0;
+            if (key.includes("INGO") && !key.includes("NNGO")) countryData[country].INGO += parseInt(row[key]) || 0;
+            if (key.includes("ICRC")) countryData[country].ICRC += parseInt(row[key]) || 0;
+            if (key.includes("NRCS") || key.includes("IFRC")) countryData[country]['NRCS and IFRC'] += parseInt(row[key]) || 0;
+            if (key.includes("NNGO")) countryData[country].NNGO += parseInt(row[key]) || 0;
+            if (key.includes("Other")) countryData[country].Other += parseInt(row[key]) || 0;
+          }
         }
       }
       

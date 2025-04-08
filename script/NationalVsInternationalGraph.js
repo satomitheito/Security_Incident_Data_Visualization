@@ -36,47 +36,51 @@ class NationalVsInternationalGraph {
       }
       const csvData = await response.text();
       
-      const rows = csvData.split('\n');
-      const headers = rows[0].split(',');
-      
-      // Find the correct column indices
-      const yearIndex = 1;  // Year is in second column
-      const totalNationalsIndex = headers.findIndex(h => h.includes("Total nationals"));
-      const totalInternationalsIndex = headers.findIndex(h => h.includes("Total internationals"));
-      
-      console.log("Column indices:", { yearIndex, totalNationalsIndex, totalInternationalsIndex });
-      
+      // Use Papa Parse instead of custom parsing
+      const parsedData = Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true
+      }).data;
+ 
       const yearlyData = {};
       
-      // Skip header row
-      for (let i = 1; i < rows.length; i++) {
-        const columns = rows[i].split(',');
-        if (columns.length < Math.max(yearIndex, totalNationalsIndex, totalInternationalsIndex)) continue;
+      // Process each row in the parsed data
+      for (let i = 0; i < parsedData.length; i++) {
+        const row = parsedData[i];
         
-        const year = parseInt(columns[yearIndex]);
-        const nationals = parseInt(columns[totalNationalsIndex]) || 0;
-        const internationals = parseInt(columns[totalInternationalsIndex]) || 0;
+        // Find the columns that contain our target data
+        let yearValue = null;
+        let nationalsValue = 0;
+        let internationalsValue = 0;
+        
+        // Identify the columns for year and the two metrics
+        for (const key in row) {
+          if (key.includes("Year")) {
+            yearValue = row[key];
+          }
+          if (key.includes("Total nationals")) {
+            nationalsValue = parseInt(row[key]) || 0;
+          }
+          if (key.includes("Total internationals")) {
+            internationalsValue = parseInt(row[key]) || 0;
+          }
+        }
+        
+        const year = parseInt(yearValue);
         
         if (!isNaN(year) && year <= 2024) {
           if (!yearlyData[year]) {
             yearlyData[year] = { nationals: 0, internationals: 0 };
           }
-          yearlyData[year].nationals += nationals;
-          yearlyData[year].internationals += internationals;
+          yearlyData[year].nationals += nationalsValue;
+          yearlyData[year].internationals += internationalsValue;
         }
       }
       
-      // Debug: Print the aggregated data
-      console.log('Yearly Data:', yearlyData);
       
       this.years = Object.keys(yearlyData).map(Number).sort((a, b) => a - b);
       this.nationalIncidents = this.years.map(year => yearlyData[year].nationals);
       this.internationalIncidents = this.years.map(year => yearlyData[year].internationals);
-      
-      // Debug: Print final arrays
-      console.log('Years:', this.years);
-      console.log('National Incidents:', this.nationalIncidents);
-      console.log('International Incidents:', this.internationalIncidents);
       
       return {
         years: this.years,

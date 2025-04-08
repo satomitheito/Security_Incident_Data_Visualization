@@ -29,22 +29,21 @@ class VerifiedReportsMap {
       }
       const csvData = await response.text();
       
-      const rows = csvData.split('\n');
-      const headers = rows[0].split(',');
-      
-      // Find relevant column indices
-      const countryIndex = headers.findIndex(h => h === "Country");
-      const verifiedIndex = headers.findIndex(h => h === "Verified");
-      const totalIndex = headers.findIndex(h => h === "Total");
+      // Use Papa Parse instead of custom parsing
+      const parsedData = Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true
+      }).data;
       
       // Store data by country
       const countryData = {};
       
-      // Skip header row
-      for (let i = 1; i < rows.length; i++) {
-        const columns = rows[i].split(',');
+      for (let i = 0; i < parsedData.length; i++) {
+        const row = parsedData[i];
         
-        const country = columns[countryIndex]?.replace(/['"]+/g, '').trim();
+        // Get country value
+        const country = row["Country"]?.trim();
+        
         if (country && country !== '') {
           if (!countryData[country]) {
             countryData[country] = {
@@ -53,8 +52,21 @@ class VerifiedReportsMap {
             };
           }
           
-          countryData[country].verified += parseInt(columns[verifiedIndex]) || 0;
-          countryData[country].total += parseInt(columns[totalIndex]) || 0;
+          // Find 'Verified' and 'Total' columns
+          let verified = 0;
+          let total = 0;
+          
+          for (const key in row) {
+            if (key === "Verified") {
+              verified = parseInt(row[key]) || 0;
+            }
+            if (key === "Total") {
+              total = parseInt(row[key]) || 0;
+            }
+          }
+          
+          countryData[country].verified += verified;
+          countryData[country].total += total;
         }
       }
       

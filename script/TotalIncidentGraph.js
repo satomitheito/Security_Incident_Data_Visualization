@@ -45,17 +45,27 @@ class TotalIncidentGraph {
       const response = await fetch('/data/security_incidents.csv');
       const csvData = await response.text();
       
-      const rows = csvData.split('\n');
-      const headers = rows[0].split(',');
-      const yearIndex = headers.findIndex(header => header.includes("Year"));
+      // Use Papa Parse instead of custom parsing
+      const parsedData = Papa.parse(csvData, {
+        header: true,
+        skipEmptyLines: true
+      }).data;
       
       const yearlyIncidents = {};
       
-      for (let i = 1; i < rows.length; i++) {
-        if (!rows[i].trim()) continue;
+      // Process each row in the parsed data
+      for (let i = 0; i < parsedData.length; i++) {
+        const row = parsedData[i];
+        // Find the year value - look for a field that might contain "Year"
+        let yearValue = null;
+        for (const key in row) {
+          if (key.includes("Year")) {
+            yearValue = row[key];
+            break;
+          }
+        }
         
-        const columns = rows[i].split(',');
-        const year = parseInt(columns[yearIndex]);
+        const year = parseInt(yearValue);
         
         if (!isNaN(year) && year <= 2024) {
           yearlyIncidents[year] = (yearlyIncidents[year] || 0) + 1;
@@ -190,7 +200,6 @@ class TotalIncidentGraph {
       window.addEventListener('wheel', this.handleWheel, { passive: false });
       document.body.classList.add('scroll-hijacked');
       this.isScrollHijacked = true;
-      console.log("Scroll hijacking enabled");
     }
   }
   
@@ -199,7 +208,6 @@ class TotalIncidentGraph {
       window.removeEventListener('wheel', this.handleWheel);
       document.body.classList.remove('scroll-hijacked');
       this.isScrollHijacked = false;
-      console.log("Scroll hijacking disabled");
     }
   }
   
