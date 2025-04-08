@@ -427,3 +427,120 @@ body.scroll-hijacked {
   font-size: 1.1em;
   text-align: justify;
 }
+
+.call-to-action-section {
+  padding: 60px 0;
+  background-color: #8A9A5B;
+  position: relative;
+  z-index: 3;
+}
+
+.call-to-action-section .container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.call-to-action-title {
+  text-align: center;
+  color: #430101;
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 2.5em;
+  font-weight: 700;
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+  text-shadow: none;
+}
+
+.message-content {
+  font-size: 1.2em;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+.drop-cap {
+  float: left;
+  font-size: 5em;
+  line-height: 0.8;
+  padding-right: 8px;
+  font-family: 'Libre Franklin', sans-serif;
+  font-weight: 700;
+  color: #430101;
+}
+
+/* Resources Section */
+.resources-section {
+  padding: 60px 0;
+  background-color: #DEDEDE;
+  position: relative;
+  z-index: 3;
+}
+
+.resources-section .container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.resources-title {
+  text-align: center;
+  color: #430101;
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 2.5em;
+  font-weight: 700;
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+}
+
+.resources-content {
+  color: #333;
+}
+
+.citation-group {
+  margin-bottom: 40px;
+}
+
+.citation-group h3 {
+  color: #430101;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.citation-group ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.citation-group li {
+  margin-bottom: 15px;
+  padding-left: 20px;
+  position: relative;
+  font-size: 1.1em;
+  line-height: 1.4;
+}
+
+.citation-group li:before {
+  content: "•";
+  color: #430101;
+  position: absolute;
+  left: 0;
+}
+
+.citation-group p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  color: #333;
+}
+
+.citation-group li a {
+  color: #430101;
+  text-decoration: none;
+  border-bottom: 1px solid #430101;
+  transition: all 0.3s ease;
+}
+
+.citation-group li a:hover {
+  color: #8A9A5B;
+  border-bottom-color: #8A9A5B;
+}
