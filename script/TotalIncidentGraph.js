@@ -494,7 +494,12 @@ class TotalIncidentGraph {
           const isAtEnd = this.scrollProgress >= 1 && this.lastScrollY - window.scrollY < 0;
           const visibleRatio = entry.intersectionRatio;
           
-          if (visibleRatio >= 1 && !isInExactMiddle && !this.isScrollHijacked && !isAtStart && !isAtEnd) {
+          // Check if we've reached the end of the timeline (year 2024)
+          const hasReachedEndOfTimeline = this.currentVisibleYears >= this.fullYears.length;
+          
+          // Only enable scroll hijacking if we haven't reached the end of the timeline
+          if (visibleRatio >= 1 && !isInExactMiddle && !this.isScrollHijacked && 
+              !isAtStart && !isAtEnd && !hasReachedEndOfTimeline) {
             const scrollSpeed = Math.abs(this.lastScrollY - window.scrollY) || 0;
             if (scrollSpeed > 10) {
               const targetScrollPosition = window.scrollY + (graphCenter - viewportCenter);
