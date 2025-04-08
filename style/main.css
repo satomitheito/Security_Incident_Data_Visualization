@@ -427,3 +427,7 @@ body.scroll-hijacked {
   font-size: 1.1em;
   text-align: justify;
 }
+
+.highlight-section {
+  height: 300vh;
+}
